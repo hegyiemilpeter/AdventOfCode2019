@@ -45,9 +45,12 @@ namespace AdventOfCode2019.InputReader
             List<T[]> response = new List<T[]>();
             using (StreamReader reader = new StreamReader(path))
             {
-                string line = reader.ReadLine();
-                T[] parsedLine = ParseLine(line, separator);
-                response.Add(parsedLine);
+                while(!reader.EndOfStream)
+                {
+                    string line = reader.ReadLine();
+                    T[] parsedLine = ParseLine(line, separator);
+                    response.Add(parsedLine);
+                }
             }
 
             return response.ToArray();
