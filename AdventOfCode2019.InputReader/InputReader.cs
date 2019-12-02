@@ -22,7 +22,7 @@ namespace AdventOfCode2019.InputReader
                 throw new FileLoadException("File content cannot be readed.");
             }
 
-            if(fileContent.Length == 0)
+            if(fileContent.Length == 1)
             {
                 return fileContent[0];
             }
