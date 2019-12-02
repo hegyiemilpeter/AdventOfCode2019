@@ -6,6 +6,7 @@ using System.Linq;
 
 namespace AdventOfCode2019.Core
 {
+    // https://adventofcode.com/2019/day/1
     public class Day1
     {
         public int CalculateFullAmount(string path)

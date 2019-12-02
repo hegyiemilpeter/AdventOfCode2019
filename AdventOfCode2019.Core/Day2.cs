@@ -1,27 +1,25 @@
-﻿using System;
+﻿using AdventOfCode2019.InputReader;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace AdventOfCode2019.Core
 {
+    // https://adventofcode.com/2019/day/2
     public class Day2
     {
-        public int GetPairForResult(string path, int expectedResult)
+        public int GetNounVerbCombination(string path, int expectedResult)
         {
-            InputReader.Day2InputReader inputReader = new InputReader.Day2InputReader();
+            Day2InputReader inputReader = new Day2InputReader();
             int[] originalInput = inputReader.ReadArray(path, ',');
-
-            int[] input = CloneOriginalInput(originalInput);
+            int[] input = new int[originalInput.Length];
 
             for (int i = 0; i < input.Length; i++)
             {
                 for (int j = 0; j <= i; j++)
                 {
                     input = CloneOriginalInput(originalInput);
-                    input[1] = i;
-                    input[2] = j;
-
-                    int result = CalculatePositionAtZero(input);
+                    int result = CalculatePositionAtZero(input, i, j);
                     if (result == expectedResult)
                     {
                         return 100 * i + j;
@@ -30,9 +28,7 @@ namespace AdventOfCode2019.Core
                     if (i != j)
                     {
                         input = CloneOriginalInput(originalInput);
-                        input[1] = j;
-                        input[2] = i;
-                        result = CalculatePositionAtZero(input);
+                        result = CalculatePositionAtZero(input, j, i);
                         if (result == expectedResult)
                         {
                             return 100 * j + i;
@@ -44,33 +40,22 @@ namespace AdventOfCode2019.Core
             return 0;
         }
 
-        private static int[] CloneOriginalInput(int[] originalInput)
+        public int GetPositionAtZero(string path, int? overwrite1, int? overwrite2)
         {
-            int[] input = new int[originalInput.Length];
-            for (int i = 0; i < originalInput.Length; i++)
-            {
-                input[i] = originalInput[i];
-            }
-
-            return input;
-        }
-
-        public int GetPositionAtZero(string path, bool release)
-        {
-            InputReader.Day2InputReader inputReader = new InputReader.Day2InputReader();
+            Day2InputReader inputReader = new Day2InputReader();
             int[] input = inputReader.ReadArray(path, ',');
 
-            if (release)
-            {
-                input[1] = 12;
-                input[2] = 2;
-            }
-
-            return CalculatePositionAtZero(input);
+            return CalculatePositionAtZero(input, overwrite1, overwrite2);
         }
 
-        private static int CalculatePositionAtZero(int[] input)
+        private static int CalculatePositionAtZero(int[] input, int? overwrite1, int? overwrite2)
         {
+            if(overwrite1.HasValue && overwrite2.HasValue)
+            {
+                input[1] = overwrite1.Value;
+                input[2] = overwrite2.Value;
+            }
+
             for (int i = 0; i < input.Length; i += 4)
             {
                 switch (input[i])
@@ -89,6 +74,17 @@ namespace AdventOfCode2019.Core
             }
 
             throw new Exception();
+        }
+
+        private static int[] CloneOriginalInput(int[] originalInput)
+        {
+            int[] input = new int[originalInput.Length];
+            for (int i = 0; i < originalInput.Length; i++)
+            {
+                input[i] = originalInput[i];
+            }
+
+            return input;
         }
     }
 }
