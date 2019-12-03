@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -7,23 +8,42 @@ namespace AdventOfCode2019.Core
 {
     public class Day3
     {
-        public int GetNearestCrossingPoint(string cable1, string cable2)
+        public int FirstStar(string c1, string c2)
         {
-            Console.WriteLine("Reading cables...");
-            var cable1_Positions = GetCablePositions(cable1);
-            var cable2_Positions = GetCablePositions(cable2);
+            var c1Points = GetCablePositions(c1);
+            var crossingPoints = GetCrossingPoints(c1Points, c2);
+            return GetNearestCrossingPoint(crossingPoints);
+        }
 
-            Console.WriteLine("Get crossing points");
-            List<Tuple<int, int>> minimumPosition = GetCrossingPoints(cable1_Positions, cable2);
-            Console.WriteLine("Finding minimum positions...");
-            var response = minimumPosition.Min(x => Math.Abs(x.Item2) + Math.Abs(x.Item1));
+        public int SecondStar(string c1, string c2)
+        {
+            var c1Points = GetCablePositions(c1);
+            var c2Points = GetCablePositions(c2);
+            var crossingPoints = GetCrossingPoints(c1Points, c2);
 
-            return response;
+            int minimum = 1000000;
+            foreach (var cp in crossingPoints)
+            {
+                int c1Step = GetSteps(c1Points, cp);
+                int c2Step = GetSteps(c2Points, cp);
+                if (minimum > c1Step + c2Step)
+                {
+                    minimum = c1Step + c2Step;
+                }
+            }
+
+            return minimum;
+        }
+
+        public int GetNearestCrossingPoint(List<Tuple<int,int>> crossingPoints)
+        {
+            int minimumPositions = crossingPoints.Min(x => Math.Abs(x.Item2) + Math.Abs(x.Item1));
+            return minimumPositions;
         }
 
         public List<Tuple<int,int>> GetCrossingPoints(List<Tuple<int,int>> cable1, string cable2)
         {
-            List<Tuple<int, int>> c2 = new List<Tuple<int, int>>();
+            List<Tuple<int, int>> crossingPoints = new List<Tuple<int, int>>();
             int x = 0, y = 0;
 
             string[] splittedCable = cable2.Split(',');
@@ -34,49 +54,42 @@ namespace AdventOfCode2019.Core
                 switch (splittedCable[i][0])
                 {
                     case 'R':
-                        var goodPoints = cable1.Where(p => p.Item2 == y);
-
                         for (int j = 0; j < value; j++)
                         {
                             x++;
-                            if(goodPoints.Any(p => p.Item1 == x && p.Item2 == y))
+                            if(IsCrossingPoint(x,y,cable1))
                             {
-                                c2.Add(new Tuple<int, int>(x, y));
+                                crossingPoints.Add(new Tuple<int, int>(x, y));
                             }
                         }
                         break;
                     case 'U':
-                        var goodPoints2 = cable1.Where(p => p.Item1 == x);
-
                         for (int j = 0; j < value; j++)
                         {
                             y++;
-                            if (goodPoints2.Any(p => p.Item1 == x && p.Item2 == y))
+                            if (IsCrossingPoint(x, y, cable1))
                             {
-                                c2.Add(new Tuple<int, int>(x, y));
+                                crossingPoints.Add(new Tuple<int, int>(x, y));
                             }
                         }
                         break;
                     case 'L':
-                        var goodPoints3 = cable1.Where(p => p.Item2 == y);
-
                         for (int j = 0; j < value; j++)
                         {
                             x--;
-                            if (goodPoints3.Any(p => p.Item1 == x && p.Item2 == y))
+                            if (IsCrossingPoint(x, y, cable1))
                             {
-                                c2.Add(new Tuple<int, int>(x, y));
+                                crossingPoints.Add(new Tuple<int, int>(x, y));
                             }
                         }
                         break;
                     case 'D':
-                        var goodPoints4 = cable1.Where(p => p.Item1 == x);
                         for (int j = 0; j < value; j++)
                         {
                             y--;
-                            if (goodPoints4.Any(p => p.Item1 == x && p.Item2 == y))
+                            if (IsCrossingPoint(x, y, cable1))
                             {
-                                c2.Add(new Tuple<int, int>(x, y));
+                                crossingPoints.Add(new Tuple<int, int>(x, y));
                             }
                         }
                         break;
@@ -85,13 +98,17 @@ namespace AdventOfCode2019.Core
                 }
             }
 
-            return c2;
+            return crossingPoints;
+        }
 
+        private static bool IsCrossingPoint(int x, int y, List<Tuple<int,int>> otherCable)
+        {
+            return otherCable.Any(c => c.Item1 == x && c.Item2 == y);
         }
 
         public List<Tuple<int,int>> GetCablePositions(string cable)
         {
-            List<Tuple<int, int>> cable1 = new List<Tuple<int, int>>();
+            List<Tuple<int, int>> response = new List<Tuple<int, int>>();
             int x = 0, y = 0;
 
             string[] splittedCable = cable.Split(',');
@@ -104,28 +121,28 @@ namespace AdventOfCode2019.Core
                         for (int j = 0; j < value; j++)
                         {
                             x++;
-                            cable1.Add(new Tuple<int, int>(x, y));
+                            response.Add(new Tuple<int, int>(x, y));
                         }
                         break;
                     case 'U':
                         for (int j = 0; j < value; j++)
                         {
                             y++;
-                            cable1.Add(new Tuple<int, int>(x, y));
+                            response.Add(new Tuple<int, int>(x, y));
                         }
                         break;
                     case 'L':
                         for (int j = 0; j < value; j++)
                         {
                             x--;
-                            cable1.Add(new Tuple<int, int>(x, y));
+                            response.Add(new Tuple<int, int>(x, y));
                         }
                         break;
                     case 'D':
                         for (int j = 0; j < value; j++)
                         {
                             y--;
-                            cable1.Add(new Tuple<int, int>(x, y));
+                            response.Add(new Tuple<int, int>(x, y));
                         }
                         break;
                     default:
@@ -133,7 +150,20 @@ namespace AdventOfCode2019.Core
                 }
             }
 
-            return cable1;
+            return response;
+        }
+
+        private int GetSteps(List<Tuple<int, int>> c1, Tuple<int, int> cp)
+        {
+            int i = 0;
+            Tuple<int, int> actualPoint = new Tuple<int, int>(0, 0);
+            while (actualPoint.Item1 != cp.Item1 || actualPoint.Item2 != cp.Item2)
+            {
+                actualPoint = c1[i];
+                i++;
+            }
+
+            return i;
         }
     }
 }

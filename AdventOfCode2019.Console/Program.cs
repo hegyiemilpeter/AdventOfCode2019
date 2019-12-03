@@ -18,7 +18,7 @@ namespace AdventOfCode2019.Cons
             }
 
             Day3 day3_solution = new Day3();
-            int min = day3_solution.GetNearestCrossingPoint(cable1, cable2);
+            int min = day3_solution.SecondStar(cable1, cable2);
 
             Console.WriteLine("Hello World!");
         }
