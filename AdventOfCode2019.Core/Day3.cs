@@ -8,24 +8,32 @@ namespace AdventOfCode2019.Core
 {
     public class Day3
     {
-        public int FirstStar(string c1, string c2)
+        public List<Tuple<int,int>> Cable1Points { get; set; }
+        public List<Tuple<int,int>> Cable2Points { get; set; }
+        public List<Tuple<int,int>> CrossingPoints { get; set; }
+
+        public int ManhattanDistanceOfClosestIntersection(string cable1, string cable2)
         {
-            var c1Points = GetCablePositions(c1);
-            var crossingPoints = GetCrossingPoints(c1Points, c2);
-            return GetNearestCrossingPoint(crossingPoints);
+            Cable1Points = GetCablePositions(cable1);
+            CrossingPoints = GetCrossingPoints(Cable1Points, cable2);
+            return DistanceOfClosestIntersection(CrossingPoints);
         }
 
-        public int SecondStar(string c1, string c2)
+        public int FewestCombinedSteps(string cable1, string cable2)
         {
-            var c1Points = GetCablePositions(c1);
-            var c2Points = GetCablePositions(c2);
-            var crossingPoints = GetCrossingPoints(c1Points, c2);
+            if (Cable1Points == null)
+                Cable1Points = GetCablePositions(cable1);
+            if(Cable2Points == null)
+                Cable2Points = GetCablePositions(cable2);
+            if(CrossingPoints == null)
+                CrossingPoints = GetCrossingPoints(Cable1Points, cable2);
 
-            int minimum = 1000000;
-            foreach (var cp in crossingPoints)
+
+            int minimum = int.MaxValue;
+            foreach (var crossingPoint in CrossingPoints)
             {
-                int c1Step = GetSteps(c1Points, cp);
-                int c2Step = GetSteps(c2Points, cp);
+                int c1Step = GetCombinedStep(Cable1Points, crossingPoint);
+                int c2Step = GetCombinedStep(Cable2Points, crossingPoint);
                 if (minimum > c1Step + c2Step)
                 {
                     minimum = c1Step + c2Step;
@@ -35,13 +43,13 @@ namespace AdventOfCode2019.Core
             return minimum;
         }
 
-        public int GetNearestCrossingPoint(List<Tuple<int,int>> crossingPoints)
+        private int DistanceOfClosestIntersection(List<Tuple<int,int>> crossingPoints)
         {
             int minimumPositions = crossingPoints.Min(x => Math.Abs(x.Item2) + Math.Abs(x.Item1));
             return minimumPositions;
         }
 
-        public List<Tuple<int,int>> GetCrossingPoints(List<Tuple<int,int>> cable1, string cable2)
+        private List<Tuple<int,int>> GetCrossingPoints(List<Tuple<int,int>> cable1, string cable2)
         {
             List<Tuple<int, int>> crossingPoints = new List<Tuple<int, int>>();
             int x = 0, y = 0;
@@ -101,12 +109,12 @@ namespace AdventOfCode2019.Core
             return crossingPoints;
         }
 
-        private static bool IsCrossingPoint(int x, int y, List<Tuple<int,int>> otherCable)
+        private bool IsCrossingPoint(int x, int y, List<Tuple<int,int>> cable)
         {
-            return otherCable.Any(c => c.Item1 == x && c.Item2 == y);
+            return cable.Any(c => c.Item1 == x && c.Item2 == y);
         }
 
-        public List<Tuple<int,int>> GetCablePositions(string cable)
+        private List<Tuple<int,int>> GetCablePositions(string cable)
         {
             List<Tuple<int, int>> response = new List<Tuple<int, int>>();
             int x = 0, y = 0;
@@ -153,13 +161,13 @@ namespace AdventOfCode2019.Core
             return response;
         }
 
-        private int GetSteps(List<Tuple<int, int>> c1, Tuple<int, int> cp)
+        private int GetCombinedStep(List<Tuple<int, int>> cable, Tuple<int, int> crossingPoint)
         {
             int i = 0;
             Tuple<int, int> actualPoint = new Tuple<int, int>(0, 0);
-            while (actualPoint.Item1 != cp.Item1 || actualPoint.Item2 != cp.Item2)
+            while (actualPoint.Item1 != crossingPoint.Item1 || actualPoint.Item2 != crossingPoint.Item2)
             {
-                actualPoint = c1[i];
+                actualPoint = cable[i];
                 i++;
             }
 
