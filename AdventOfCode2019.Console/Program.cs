@@ -10,6 +10,17 @@ namespace AdventOfCode2019.Cons
     {
         static void Main(string[] args)
         {
+            // // Day 4
+            // Day4();
+
+            // // Day 3
+            // Day3();
+
+            Console.ReadLine();
+        }
+
+        private static void Day3()
+        {
             string cable1, cable2;
             using (StreamReader reader = new StreamReader(@"Input\day3_1.txt"))
             {
@@ -22,8 +33,20 @@ namespace AdventOfCode2019.Cons
             Console.WriteLine($"Manhattan distance of closest intersection: {closestIntersectionDistance}");
             int fewestCombinedSteps = day3_solution.FewestCombinedSteps(cable1, cable2);
             Console.WriteLine($"Fewest combined steps: {fewestCombinedSteps}");
+        }
 
-            Console.ReadLine();
+        private static void Day4()
+        {
+            int count = 0;
+            for (int i = 128392; i <= 643281; i++)
+            {
+                if (Core.Day4.IsValidPasswordAdvanced(i))
+                {
+                    count++;
+                }
+            }
+
+            Console.WriteLine(count);
         }
     }
 }
