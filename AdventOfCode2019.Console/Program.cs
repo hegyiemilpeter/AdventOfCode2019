@@ -15,8 +15,17 @@ namespace AdventOfCode2019.Cons
 
             // // Day 3
             // Day3();
+            
+            // // Day 8
+            // Day8();
 
             Console.ReadLine();
+        }
+
+        private static void Day8()
+        {
+            Day8 day8_solution = new Day8();
+            var reponse = day8_solution.GetMessage(@"Input\day8_1.txt", 25, 6);
         }
 
         private static void Day3()
