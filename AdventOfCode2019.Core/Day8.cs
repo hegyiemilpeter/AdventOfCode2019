@@ -36,18 +36,18 @@ namespace AdventOfCode2019.Core
         {
             GetLayers(path, width, height);
 
-            int[,] m = new int[width, height];
+            int[,] resultMatrix = new int[width, height];
             for (int i = 0; i < height; i++)
             {
                 for (int j = 0; j < width; j++)
                 {
-                    int k = 0;
-                    while (layers[k][j, i] == 2)
+                    int layer = 0;
+                    while (layers[layer][j, i] == 2)
                     {
-                        k++;
+                        layer++;
                     }
 
-                    m[j, i] = layers[k][j, i];
+                    resultMatrix[j, i] = layers[layer][j, i];
                 }
             }
 
@@ -56,12 +56,8 @@ namespace AdventOfCode2019.Core
             {
                 for (int j = 0; j < width; j++)
                 {
-                    if (m[j, i] != 0)
-                        Debug.Write(m[j, i]);
-                    else
-                        Debug.Write(" ");
+                    response.Append(resultMatrix[j, i]);
                 }
-                Debug.WriteLine("");
             }
 
             return response.ToString();
@@ -89,17 +85,17 @@ namespace AdventOfCode2019.Core
 
         private int NumberOfNumber(int[,] matrix, int number, int width, int height)
         {
-            int sum = 0;
+            int count = 0;
             for (int i = 0; i < width; i++)
             {
                 for (int j = 0; j < height; j++)
                 {
                     if (matrix[i, j] == number)
-                        sum++;
+                        count++;
                 }
             }
 
-            return sum;
+            return count;
         }
 
     }

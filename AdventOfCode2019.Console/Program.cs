@@ -15,9 +15,9 @@ namespace AdventOfCode2019.Cons
 
             // // Day 3
             // Day3();
-            
-            // // Day 8
-            // Day8();
+
+            // Day 8
+            Day8();
 
             Console.ReadLine();
         }
@@ -25,7 +25,25 @@ namespace AdventOfCode2019.Cons
         private static void Day8()
         {
             Day8 day8_solution = new Day8();
-            var reponse = day8_solution.GetMessage(@"Input\day8_1.txt", 25, 6);
+
+            int result = day8_solution.GetMaximumNumberOfOneAndTwo(@"Input\day8_1.txt", 25, 6);
+            Console.WriteLine(result);
+
+            string reponse = day8_solution.GetMessage(@"Input\day8_1.txt", 25, 6);
+            int counter = 0;
+            for (int i = 0; i < 6; i++)
+            {
+                for (int j = 0; j < 25; j++)
+                {
+                    if (reponse[counter] == '1')
+                        Console.Write("X");
+                    else
+                        Console.Write(" ");
+                    counter++;
+                }
+
+                Console.WriteLine("");
+            }
         }
 
         private static void Day3()
