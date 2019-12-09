@@ -9,29 +9,33 @@ namespace AdventOfCode2019.Tests
 {
     public class Day7Tests
     {
-        //[Test]
-        //[TestCase(@"..\..\..\Inputs\day7_demo1.txt", ExpectedResult = 43210)]
-        //[TestCase(@"..\..\..\Inputs\day7_demo2.txt", ExpectedResult = 54321)]
-        //[TestCase(@"..\..\..\Inputs\day7_demo3.txt", ExpectedResult = 65210)]
-        //public async Task<int> GetMaximumThrusterSignal(string path)
-        //{
-        //    Day7 day7_solution = new Day7();
-        //    return await day7_solution.GetOutput(path, 0);
-        //}
-
-        //[Test]
-        //public void FirstStarTest()
-        //{
-        //    Day7 day7_solution = new Day7();
-        //    var response = day7_solution.GetOutput(@"..\..\..\Inputs\day7_1.txt", 0);
-        //    Assert.AreEqual(46014, response);
-        //}
-
         [Test]
-        public async Task SecondStarTest_Demo()
+        [TestCase(@"..\..\..\Inputs\day7_demo1.txt", ExpectedResult = 43210)]
+        [TestCase(@"..\..\..\Inputs\day7_demo2.txt", ExpectedResult = 54321)]
+        [TestCase(@"..\..\..\Inputs\day7_demo3.txt", ExpectedResult = 65210)]
+        public int FirstStarTests_Demo(string path)
         {
             Day7 day7_solution = new Day7();
-            var response = await day7_solution.GetOutput(@"..\..\..\inputs\day7_1.txt");
+            return day7_solution.RunInlineAmplifiers(path);
+        }
+
+        [Test]
+        public void FirstStarTest()
+        {
+            Day7 day7_solution = new Day7();
+            var response = day7_solution.RunInlineAmplifiers(@"..\..\..\Inputs\day7_1.txt");
+            Assert.AreEqual(46014, response);
+        }
+
+        [Test]
+        [TestCase(@"..\..\..\inputs\day7_1.txt", ExpectedResult = 19581200)]
+        [TestCase(@"..\..\..\inputs\day7_2_demo1.txt", ExpectedResult = 139629729)]
+        [TestCase(@"..\..\..\inputs\day7_2_demo2.txt", ExpectedResult = 18216)]
+        public int SecondStarTests(string path)
+        {
+            Day7 day7_solution = new Day7();
+            int response = day7_solution.RunParalellAmplifiers(path);
+            return response;
         }
     }
 }

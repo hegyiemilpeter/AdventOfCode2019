@@ -10,172 +10,42 @@ namespace AdventOfCode2019.Core
 {
     public class Day7
     {
-        public class Amplifier
-        {
-            private int[] memory;
-            public int[] Memory
-            {
-                get
-                {
-                    return memory;
-                }
-                set
-                {
-                    memory = new int[value.Length];
-                    for (int i = 0; i < value.Length; i++)
-                    {
-                        memory[i] = value[i];
-                    }
-                }
-            }
-
-            public List<int> Input { get; set; }
-
-            public List<int> Output { get; set; }
-
-            public string Name { get; set; }
-
-            public bool Finished { get; set; }
-
-            public int Pointer { get; set; }
-
-            public void IntCode()
-            {
-                int opcode = Memory[Pointer] % 100;
-                int parameterMode1 = (Memory[Pointer] % 1000) / 100;
-                int parameterMode2 = (Memory[Pointer] % 10000) / 1000;
-                int parameterMode3 = (Memory[Pointer] % 100000) / 10000;
-                int parameter1, parameter2, position;
-                //Debug.WriteLine($"{Name} is processing {opcode}");
-                switch (opcode)
-                {
-                    case 1:
-                        parameter1 = GetParameter(Memory, Pointer + 1, parameterMode1);
-                        parameter2 = GetParameter(Memory, Pointer + 2, parameterMode2);
-                        int sumOfParameters = parameter1 + parameter2;
-                        if (parameterMode3 == 0)
-                        {
-                            Memory[Memory[Pointer + 3]] = sumOfParameters;
-                        }
-                        else
-                        {
-                            Memory[Pointer + 3] = sumOfParameters;
-                        }
-                        Pointer += 4;
-                        break;
-                    case 2:
-                        parameter1 = GetParameter(Memory, Pointer + 1, parameterMode1);
-                        parameter2 = GetParameter(Memory, Pointer + 2, parameterMode2);
-                        int multiplyOfParameters = parameter1 * parameter2;
-                        if (parameterMode3 == 0)
-                        {
-                            Memory[Memory[Pointer + 3]] = multiplyOfParameters;
-                        }
-                        else
-                        {
-                            Memory[Pointer + 3] = multiplyOfParameters;
-                        }
-                        Pointer += 4;
-                        break;
-                    case 3:
-                        while(Input.Count == 0)
-                        {
-                            //Debug.WriteLine($"{Name} is waiting for input");
-                            return;
-                        }
-
-                        //Debug.WriteLine($"{Name} is taking input");
-                        if (parameterMode1 == 0)
-                        {
-                            Memory[Memory[Pointer + 1]] = Input[0];
-                            Input.RemoveAt(0);
-                        }
-                        else
-                        {
-                            Memory[Pointer + 1] = Input[0];
-                            Input.RemoveAt(0);
-                        }
-                        Pointer += 2;
-                        break;
-                    case 4:
-                        if (parameterMode1 == 0)
-                        {
-                            Output.Add(Memory[Memory[Pointer + 1]]);
-                        }
-                        else
-                        {
-                            Output.Add(Memory[Pointer + 1]);
-                        }
-                        //Debug.WriteLine($"{Name} processing output...");
-                        Pointer += 2;
-                        break;
-                    case 5:
-                        parameter1 = GetParameter(Memory, Pointer + 1, parameterMode1);
-                        if (parameter1 != 0)
-                        {
-                            Pointer = GetParameter(Memory, Pointer + 2, parameterMode2);
-                        }
-                        else
-                        {
-                            Pointer += 3;
-                        }
-                        break;
-                    case 6:
-                        parameter1 = GetParameter(Memory, Pointer + 1, parameterMode1);
-                        if (parameter1 == 0)
-                        {
-                            Pointer = GetParameter(Memory, Pointer + 2, parameterMode2);
-                        }
-                        else
-                        {
-                            Pointer += 3;
-                        }
-                        break;
-                    case 7:
-                        parameter1 = GetParameter(Memory, Pointer + 1, parameterMode1);
-                        parameter2 = GetParameter(Memory, Pointer + 2, parameterMode2);
-                        position = parameterMode3 == 0 ? Memory[Pointer + 3] : Memory[Memory[Pointer + 3]];
-                        if (parameter1 < parameter2)
-                        {
-                            Memory[position] = 1;
-                        }
-                        else
-                        {
-                            Memory[position] = 0;
-                        }
-                        Pointer += 4;
-                        break;
-                    case 8:
-                        int nextParameter41 = GetParameter(Memory, Pointer + 1, parameterMode1);
-                        int nextParameter42 = GetParameter(Memory, Pointer + 2, parameterMode2);
-                        position = parameterMode3 == 0 ? Memory[Pointer + 3] : Memory[Memory[Pointer + 3]];
-                        if (nextParameter41 == nextParameter42)
-                        {
-                            Memory[position] = 1;
-                        }
-                        else
-                        {
-                            Memory[position] = 0;
-                        }
-                        Pointer += 4;
-                        break;
-                    case 99:
-                        Finished = true;
-                        break;
-                    default:
-                        throw new Exception();
-                }
-                
-            }
-        }
-
-        public async Task<int> GetOutput(string path)
+        public int RunInlineAmplifiers(string path)
         {
             Day2InputReader day2InputReader = new Day2InputReader();
             int[] Memory = day2InputReader.ReadArray(path, ',');
 
             int maximum = 0;
+            int[] phase = new int[5] { 0, 0, 0, 0, 0 };
+            for (int i = 0; i <= 44444; i++)
+            {
+                string number = GetNumberAsString(i);
+                if (!NumberContains01234(number))
+                {
+                    continue;
+                }
 
+                for (int j = 0; j < 5; j++)
+                {
+                    phase[j] = int.Parse(number[j].ToString());
+                }
+
+                int output = GetOutputForPhase(Memory, phase);
+                if (output > maximum)
+                {
+                    maximum = output;
+                }
+            }
+
+            return maximum;
+        }
+
+        public int RunParalellAmplifiers(string path)
+        {
+            Day2InputReader day2InputReader = new Day2InputReader();
+            int[] Memory = day2InputReader.ReadArray(path, ',');
+
+            int maximum = 0;
             int[] phase = new int[5] { 0, 0, 0, 0, 0 };
             for (int i = 56789; i <= 98765; i++)
             {
@@ -191,22 +61,15 @@ namespace AdventOfCode2019.Core
                 }
 
                 int output = GetOutputForPhase(Memory, phase);
-                //Debug.WriteLine($"Found: {number} -> {output}");
                 if (output > maximum)
                 {
                     maximum = output;
-                    //Debug.WriteLine($"MAX: {number} -> {output}");
                 }
             }
+
             return maximum;
         }
-        public int GetOutputForPhase(string path, int[] phases)
-        {
-            Day2InputReader day2InputReader = new Day2InputReader();
-            int[] Memory = day2InputReader.ReadArray(path, ',');
 
-            return GetOutputForPhase(Memory, phases);
-        }
         private int GetOutputForPhase(int[] fileContent, int[] phases)
         {
             List<int> signalsA = new List<int>(){ phases[0], 0 };
@@ -263,25 +126,6 @@ namespace AdventOfCode2019.Core
             }
 
             return numberAsString;
-        }
-
-        private static void WriteInputToDebug(int[] input)
-        {
-            StringBuilder sb = new StringBuilder("VALUES: ");
-            for (int t = 0; t < input.Length; t++)
-            {
-                sb.Append(input[t] + " ");
-            }
-
-            Debug.WriteLine(sb.ToString());
-        }
-
-        private static int GetParameter(int[] input, int i, int mode)
-        {
-            if (mode == 0)
-                return input[input[i]];
-
-            return input[i];
         }
     }
 }
