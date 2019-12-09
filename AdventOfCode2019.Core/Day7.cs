@@ -10,12 +10,12 @@ namespace AdventOfCode2019.Core
 {
     public class Day7
     {
-        public float RunInlineAmplifiers(string path)
+        public decimal RunInlineAmplifiers(string path)
         {
             Day7InputReader day2InputReader = new Day7InputReader();
-            List<float> Memory = day2InputReader.ReadArray(path, ',').ToList();
+            List<decimal> Memory = day2InputReader.ReadArray(path, ',').ToList();
 
-            float maximum = 0;
+            decimal maximum = 0;
             int[] phase = new int[5] { 0, 0, 0, 0, 0 };
             for (int i = 0; i <= 44444; i++)
             {
@@ -30,7 +30,7 @@ namespace AdventOfCode2019.Core
                     phase[j] = int.Parse(number[j].ToString());
                 }
 
-                float output = GetInlineOutput(Memory, phase);
+                decimal output = GetInlineOutput(Memory, phase);
                 if (output > maximum)
                 {
                     maximum = output;
@@ -40,12 +40,12 @@ namespace AdventOfCode2019.Core
             return maximum;
         }
 
-        public float RunParalellAmplifiers(string path)
+        public decimal RunParalellAmplifiers(string path)
         {
             Day7InputReader day2InputReader = new Day7InputReader();
-            List<float> Memory = day2InputReader.ReadArray(path, ',').ToList();
+            List<decimal> Memory = day2InputReader.ReadArray(path, ',').ToList();
 
-            float maximum = 0;
+            decimal maximum = 0;
             int[] phase = new int[5] { 0, 0, 0, 0, 0 };
             for (int i = 56789; i <= 98765; i++)
             {
@@ -60,7 +60,7 @@ namespace AdventOfCode2019.Core
                     phase[j] = int.Parse(number[j].ToString());
                 }
 
-                float output = GetParalellOutput(Memory, phase);
+                decimal output = GetParalellOutput(Memory, phase);
                 if (output > maximum)
                 {
                     maximum = output;
@@ -70,50 +70,25 @@ namespace AdventOfCode2019.Core
             return maximum;
         }
 
-        private float GetInlineOutput(List<float> fileContent, int[] phases)
+        private decimal GetInlineOutput(List<decimal> fileContent, int[] phases)
         {
-            List<float> signalsA = new List<float>(){ phases[0], 0 };
-            List<float> signalsB = new List<float>(){ phases[1] };
-            List<float> signalsC = new List<float>(){ phases[2] };
-            List<float> signalsD = new List<float>(){ phases[3] };
-            List<float> signalsE = new List<float>(){ phases[4] };
-
-            Amplifier a = new Amplifier() { Input = signalsA, Memory = fileContent, Output = signalsB, Name="A" };
-            Amplifier b = new Amplifier() { Input = signalsB, Memory = fileContent, Output = signalsC, Name="B" };
-            Amplifier c = new Amplifier() { Input = signalsC, Memory = fileContent, Output = signalsD, Name="C" };
-            Amplifier d = new Amplifier() { Input = signalsD, Memory = fileContent, Output = signalsE, Name="D" };
-            Amplifier e = new Amplifier() { Input = signalsE, Memory = fileContent, Output = signalsA, Name="E" };
-
-            List<Amplifier> amps = new List<Amplifier> { a, b, c, d, e };
-            while (!e.Finished)
+            List<Amplifier> amps = GetAmplifiers(fileContent, phases);
+            while (!amps.Last().Finished)
             {
                 foreach (var amp in amps)
                 {
-                    while(!amp.Finished)
+                    while (!amp.Finished)
                         amp.IntCode();
                 }
             }
 
-            a.Input.Last();
-            return e.Output.Last();
+            return amps.Last().Output.Last();
         }
 
-        private float GetParalellOutput(List<float> fileContent, int[] phases)
+        private decimal GetParalellOutput(List<decimal> fileContent, int[] phases)
         {
-            List<float> signalsA = new List<float>() { phases[0], 0 };
-            List<float> signalsB = new List<float>() { phases[1] };
-            List<float> signalsC = new List<float>() { phases[2] };
-            List<float> signalsD = new List<float>() { phases[3] };
-            List<float> signalsE = new List<float>() { phases[4] };
-
-            Amplifier a = new Amplifier() { Input = signalsA, Memory = fileContent, Output = signalsB, Name = "A" };
-            Amplifier b = new Amplifier() { Input = signalsB, Memory = fileContent, Output = signalsC, Name = "B" };
-            Amplifier c = new Amplifier() { Input = signalsC, Memory = fileContent, Output = signalsD, Name = "C" };
-            Amplifier d = new Amplifier() { Input = signalsD, Memory = fileContent, Output = signalsE, Name = "D" };
-            Amplifier e = new Amplifier() { Input = signalsE, Memory = fileContent, Output = signalsA, Name = "E" };
-
-            List<Amplifier> amps = new List<Amplifier> { a, b, c, d, e };
-            while (!e.Finished)
+            List<Amplifier> amps = GetAmplifiers(fileContent, phases);
+            while (!amps.Last().Finished)
             {
                 foreach (var amp in amps)
                 {
@@ -121,8 +96,24 @@ namespace AdventOfCode2019.Core
                 }
             }
 
-            a.Input.Last();
-            return e.Output.Last();
+            return amps.Last().Output.Last();
+        }
+
+        private List<Amplifier> GetAmplifiers(List<decimal> fileContent, int[] phases)
+        {
+            List<decimal> signalsA = new List<decimal>() { phases[0], 0 };
+            List<decimal> signalsB = new List<decimal>() { phases[1] };
+            List<decimal> signalsC = new List<decimal>() { phases[2] };
+            List<decimal> signalsD = new List<decimal>() { phases[3] };
+            List<decimal> signalsE = new List<decimal>() { phases[4] };
+
+            Amplifier a = new Amplifier() { Input = signalsA, Memory = fileContent, Output = signalsB, Name = "A" };
+            Amplifier b = new Amplifier() { Input = signalsB, Memory = fileContent, Output = signalsC, Name = "B" };
+            Amplifier c = new Amplifier() { Input = signalsC, Memory = fileContent, Output = signalsD, Name = "C" };
+            Amplifier d = new Amplifier() { Input = signalsD, Memory = fileContent, Output = signalsE, Name = "D" };
+            Amplifier e = new Amplifier() { Input = signalsE, Memory = fileContent, Output = signalsA, Name = "E" };
+
+            return new List<Amplifier> { a, b, c, d, e }; ;
         }
 
         private bool NumberContains01234(string input)

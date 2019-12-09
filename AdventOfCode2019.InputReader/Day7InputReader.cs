@@ -5,11 +5,11 @@ using System.Text;
 
 namespace AdventOfCode2019.InputReader
 {
-    public class Day7InputReader : InputReader<float>
+    public class Day7InputReader : InputReader<decimal>
     {
-        public override float[] ParseLine(string line, char? separator = ',')
+        public override decimal[] ParseLine(string line, char? separator = ',')
         {
-            float[] response = line.Split(separator.Value).Select(x => float.Parse(x)).ToArray();
+            decimal[] response = line.Split(separator.Value).Select(x => decimal.Parse(x)).ToArray();
             return response;
         }
     }

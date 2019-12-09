@@ -7,8 +7,8 @@ namespace AdventOfCode2019.Core
 {
     public class Amplifier
     {
-        private List<float> memory;
-        public List<float> Memory
+        private List<decimal> memory;
+        public List<decimal> Memory
         {
             get
             {
@@ -16,7 +16,7 @@ namespace AdventOfCode2019.Core
             }
             set
             {
-                memory = new List<float>();
+                memory = new List<decimal>();
                 for (int i = 0; i < value.Count; i++)
                 {
                     memory.Add(value[i]);
@@ -24,9 +24,9 @@ namespace AdventOfCode2019.Core
             }
         }
 
-        public List<float> Input { get; set; }
+        public List<decimal> Input { get; set; }
 
-        public List<float> Output { get; set; }
+        public List<decimal> Output { get; set; }
 
         public string Name { get; set; }
 
@@ -34,7 +34,7 @@ namespace AdventOfCode2019.Core
 
         public int Pointer { get; set; }
 
-        public float RelativeBase { get; set; }
+        public decimal RelativeBase { get; set; }
 
         public void IntCode()
         {
@@ -42,7 +42,7 @@ namespace AdventOfCode2019.Core
             int parameterMode1 = (int)(Memory[Pointer] % 1000) / 100;
             int parameterMode2 = (int)(Memory[Pointer] % 10000) / 1000;
             int parameterMode3 = (int)(Memory[Pointer] % 100000) / 10000;
-            float parameter1, parameter2;
+            decimal parameter1, parameter2;
             switch (opcode)
             {
                 case 1:
@@ -98,11 +98,11 @@ namespace AdventOfCode2019.Core
                     
                     if (parameter1 < parameter2)
                     {
-                        SetValue(Pointer + 3, parameterMode3, 1);
+                        Memory[GetPosition(Pointer + 3, parameterMode3)] = 1;
                     }
                     else
                     {
-                        SetValue(Pointer + 3, parameterMode3, 0);
+                        Memory[GetPosition(Pointer + 3, parameterMode3)] = 0;
                     }
                     Pointer += 4;
                     break;
@@ -112,11 +112,11 @@ namespace AdventOfCode2019.Core
                     
                     if (parameter1 == parameter2)
                     {
-                        SetValue(Pointer + 3, parameterMode3, 1);
+                        Memory[GetPosition(Pointer + 3, parameterMode3)] = 1;
                     }
                     else
                     {
-                        SetValue(Pointer + 3, parameterMode3, 0);
+                        Memory[GetPosition(Pointer + 3, parameterMode3)] = 0;
                     }
                     Pointer += 4;
                     break;
@@ -133,35 +133,9 @@ namespace AdventOfCode2019.Core
             }
         }
 
-        private void SetValue(int pointer, int parameterMode, float value)
+        private decimal GetValue(int i, int mode)
         {
-            if(parameterMode == 0)
-            {
-                if (Memory.Count <= (int)Memory[pointer])
-                {
-                    ExtendMemory((int)Memory[pointer]);
-                }
-
-                Memory[(int)Memory[pointer]] = value;
-            }
-            else if (parameterMode == 1)
-            {
-                Memory[pointer] = value;
-            }
-            else
-            {
-                if(Memory.Count <= (int)(RelativeBase + Memory[pointer]))
-                {
-                    ExtendMemory((int)(RelativeBase + Memory[pointer]));
-                }
-
-                Memory[(int)(RelativeBase + Memory[pointer])] = value;
-            }
-        }
-
-        private float GetValue(int i, int mode)
-        {
-            float response;
+            decimal response;
             if (mode == 0) // position mode
             {
                 if (Memory[i] >= Memory.Count)
@@ -180,14 +154,14 @@ namespace AdventOfCode2019.Core
 
                 response = Memory[i];
             }
-            else
+            else // relative mode
             {
                 if (Memory[i] >= Memory.Count)
                 {
                     ExtendMemory((int)Memory[i]);
                 }
 
-                response = RelativeBase + Memory[(int)Memory[i]];
+                response =  Memory[(int)(RelativeBase + Memory[i])];
             }
             return response;
         }
