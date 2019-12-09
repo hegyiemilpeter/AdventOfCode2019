@@ -13,7 +13,7 @@ namespace AdventOfCode2019.Tests
         [TestCase(@"..\..\..\Inputs\day7_demo1.txt", ExpectedResult = 43210)]
         [TestCase(@"..\..\..\Inputs\day7_demo2.txt", ExpectedResult = 54321)]
         [TestCase(@"..\..\..\Inputs\day7_demo3.txt", ExpectedResult = 65210)]
-        public int FirstStarTests_Demo(string path)
+        public float FirstStarTests_Demo(string path)
         {
             Day7 day7_solution = new Day7();
             return day7_solution.RunInlineAmplifiers(path);
@@ -31,10 +31,10 @@ namespace AdventOfCode2019.Tests
         [TestCase(@"..\..\..\inputs\day7_1.txt", ExpectedResult = 19581200)]
         [TestCase(@"..\..\..\inputs\day7_2_demo1.txt", ExpectedResult = 139629729)]
         [TestCase(@"..\..\..\inputs\day7_2_demo2.txt", ExpectedResult = 18216)]
-        public int SecondStarTests(string path)
+        public float SecondStarTests(string path)
         {
             Day7 day7_solution = new Day7();
-            int response = day7_solution.RunParalellAmplifiers(path);
+            float response = day7_solution.RunParalellAmplifiers(path);
             return response;
         }
     }

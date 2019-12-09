@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 
 namespace AdventOfCode2019.Core
 {
     public class Amplifier
     {
-        private int[] memory;
-        public int[] Memory
+        private List<float> memory;
+        public List<float> Memory
         {
             get
             {
@@ -15,17 +16,17 @@ namespace AdventOfCode2019.Core
             }
             set
             {
-                memory = new int[value.Length];
-                for (int i = 0; i < value.Length; i++)
+                memory = new List<float>();
+                for (int i = 0; i < value.Count; i++)
                 {
-                    memory[i] = value[i];
+                    memory.Add(value[i]);
                 }
             }
         }
 
-        public List<int> Input { get; set; }
+        public List<float> Input { get; set; }
 
-        public List<int> Output { get; set; }
+        public List<float> Output { get; set; }
 
         public string Name { get; set; }
 
@@ -33,25 +34,27 @@ namespace AdventOfCode2019.Core
 
         public int Pointer { get; set; }
 
+        public float RelativeBase { get; set; }
+
         public void IntCode()
         {
-            int opcode = Memory[Pointer] % 100;
-            int parameterMode1 = (Memory[Pointer] % 1000) / 100;
-            int parameterMode2 = (Memory[Pointer] % 10000) / 1000;
-            int parameterMode3 = (Memory[Pointer] % 100000) / 10000;
-            int parameter1, parameter2, position;
+            int opcode = (int)Memory[Pointer] % 100;
+            int parameterMode1 = (int)(Memory[Pointer] % 1000) / 100;
+            int parameterMode2 = (int)(Memory[Pointer] % 10000) / 1000;
+            int parameterMode3 = (int)(Memory[Pointer] % 100000) / 10000;
+            float parameter1, parameter2;
             switch (opcode)
             {
                 case 1:
-                    parameter1 = GetValue(Memory, Pointer + 1, parameterMode1);
-                    parameter2 = GetValue(Memory, Pointer + 2, parameterMode2);
-                    Memory[GetPosition(Memory, Pointer + 3, parameterMode3)] = parameter1 + parameter2;
+                    parameter1 = GetValue(Pointer + 1, parameterMode1);
+                    parameter2 = GetValue(Pointer + 2, parameterMode2);
+                    Memory[GetPosition(Pointer + 3, parameterMode3)] = parameter1 + parameter2;
                     Pointer += 4;
                     break;
                 case 2:
-                    parameter1 = GetValue(Memory, Pointer + 1, parameterMode1);
-                    parameter2 = GetValue(Memory, Pointer + 2, parameterMode2);
-                    Memory[GetPosition(Memory, Pointer + 3, parameterMode3)] = parameter1 * parameter2;
+                    parameter1 = GetValue(Pointer + 1, parameterMode1);
+                    parameter2 = GetValue(Pointer + 2, parameterMode2);
+                    Memory[GetPosition(Pointer + 3, parameterMode3)] = parameter1 * parameter2;
                     Pointer += 4;
                     break;
                 case 3:
@@ -59,21 +62,19 @@ namespace AdventOfCode2019.Core
                     {
                         return;
                     }
-
-                    Memory[GetPosition(Memory, Pointer + 1, parameterMode1)] = Input[0];
+                    Memory[GetPosition(Pointer + 1, parameterMode1)] = Input[0];
                     Input.RemoveAt(0);
-                    
                     Pointer += 2;
                     break;
                 case 4:
-                    Output.Add(Memory[GetPosition(Memory, Pointer + 1, parameterMode1)]);
+                    Output.Add(Memory[GetPosition(Pointer + 1, parameterMode1)]);
                     Pointer += 2;
                     break;
                 case 5:
-                    parameter1 = GetValue(Memory, Pointer + 1, parameterMode1);
+                    parameter1 = GetValue(Pointer + 1, parameterMode1);
                     if (parameter1 != 0)
                     {
-                        Pointer = GetValue(Memory, Pointer + 2, parameterMode2);
+                        Pointer = (int)GetValue(Pointer + 2, parameterMode2); ;
                     }
                     else
                     {
@@ -81,10 +82,10 @@ namespace AdventOfCode2019.Core
                     }
                     break;
                 case 6:
-                    parameter1 = GetValue(Memory, Pointer + 1, parameterMode1);
+                    parameter1 = GetValue(Pointer + 1, parameterMode1);
                     if (parameter1 == 0)
                     {
-                        Pointer = GetValue(Memory, Pointer + 2, parameterMode2);
+                        Pointer = (int)GetValue(Pointer + 2, parameterMode2); ;
                     }
                     else
                     {
@@ -92,32 +93,37 @@ namespace AdventOfCode2019.Core
                     }
                     break;
                 case 7:
-                    parameter1 = GetValue(Memory, Pointer + 1, parameterMode1);
-                    parameter2 = GetValue(Memory, Pointer + 2, parameterMode2);
-                    position = GetPosition(Memory, Pointer + 3, parameterMode3);
+                    parameter1 = GetValue(Pointer + 1, parameterMode1);
+                    parameter2 = GetValue(Pointer + 2, parameterMode2);
+                    
                     if (parameter1 < parameter2)
                     {
-                        Memory[position] = 1;
+                        SetValue(Pointer + 3, parameterMode3, 1);
                     }
                     else
                     {
-                        Memory[position] = 0;
+                        SetValue(Pointer + 3, parameterMode3, 0);
                     }
                     Pointer += 4;
                     break;
                 case 8:
-                    int nextParameter41 = GetValue(Memory, Pointer + 1, parameterMode1);
-                    int nextParameter42 = GetValue(Memory, Pointer + 2, parameterMode2);
-                    position = GetPosition(Memory, Pointer + 3, parameterMode3);
-                    if (nextParameter41 == nextParameter42)
+                    parameter1 = GetValue(Pointer + 1, parameterMode1);
+                    parameter2 = GetValue(Pointer + 2, parameterMode2);
+                    
+                    if (parameter1 == parameter2)
                     {
-                        Memory[position] = 1;
+                        SetValue(Pointer + 3, parameterMode3, 1);
                     }
                     else
                     {
-                        Memory[position] = 0;
+                        SetValue(Pointer + 3, parameterMode3, 0);
                     }
                     Pointer += 4;
+                    break;
+                case 9:
+                    parameter1 = GetValue(Pointer + 1, parameterMode1);
+                    RelativeBase += parameter1;
+                    Pointer += 2;
                     break;
                 case 99:
                     Finished = true;
@@ -127,20 +133,89 @@ namespace AdventOfCode2019.Core
             }
         }
 
-        private static int GetValue(int[] input, int i, int mode)
+        private void SetValue(int pointer, int parameterMode, float value)
         {
-            if (mode == 0)
-                return input[input[i]];
+            if(parameterMode == 0)
+            {
+                if (Memory.Count <= (int)Memory[pointer])
+                {
+                    ExtendMemory((int)Memory[pointer]);
+                }
 
-            return input[i];
+                Memory[(int)Memory[pointer]] = value;
+            }
+            else if (parameterMode == 1)
+            {
+                Memory[pointer] = value;
+            }
+            else
+            {
+                if(Memory.Count <= (int)(RelativeBase + Memory[pointer]))
+                {
+                    ExtendMemory((int)(RelativeBase + Memory[pointer]));
+                }
+
+                Memory[(int)(RelativeBase + Memory[pointer])] = value;
+            }
         }
 
-        private static int GetPosition(int[] input, int i, int mode)
+        private float GetValue(int i, int mode)
         {
-            if (mode == 0)
-                return input[i];
+            float response;
+            if (mode == 0) // position mode
+            {
+                if (Memory[i] >= Memory.Count)
+                {
+                    ExtendMemory((int)Memory[i]);
+                }
 
-            return i;
+                response = Memory[(int)Memory[i]];
+            }
+            else if (mode == 1) // immediate mode
+            {
+                if (i >= Memory.Count)
+                {
+                    ExtendMemory(i);
+                }
+
+                response = Memory[i];
+            }
+            else
+            {
+                if (Memory[i] >= Memory.Count)
+                {
+                    ExtendMemory((int)Memory[i]);
+                }
+
+                response = RelativeBase + Memory[(int)Memory[i]];
+            }
+            return response;
+        }
+
+        private  int GetPosition(int i, int mode)
+        {
+            int response;
+            if (mode == 0) // position mode
+                response = (int)Memory[i];
+            else if (mode == 1) // immediate mode
+                response = i;
+            else // relative mode
+                response = (int)(RelativeBase + Memory[i]);
+
+            if (response >= Memory.Count)
+            {
+                ExtendMemory(response);
+            }
+
+            return response; 
+        }
+
+        private void ExtendMemory(int goal)
+        {
+            for (int k = Memory.Count + 1; k <= goal + 1; k++)
+            {
+                Memory.Add(0);
+            }
         }
     }
 }
